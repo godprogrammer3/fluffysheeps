@@ -116,15 +116,72 @@ contract("Fluffysheeps", (accounts) => {
       assert.equal(result.receipt.status, true);
       assert.equal(result.logs[0].args.to, alice);
     });
-    it("should be unable to mint cause not not_enough_sheeps totalSheeps = 10 case", async () => {
+    it("should be able to mint cause not not_enough_sheeps totalSheeps = 20 case", async () => {
       await contractInstance.setActiveSale(true);
-      await contractInstance._setMaxTotalFluffySheepsTest(10);
-      const result = await contractInstance.mintFluffySheeps(10, {
+      await contractInstance._setMaxTotalFluffySheepsTest(20);
+      const result = await contractInstance.mintFluffySheeps(20, {
         from: alice,
-        value: web3.utils.toWei("4", "ether"),
+        value: web3.utils.toWei("0.8", "ether"),
       });
       assert.equal(result.receipt.status, true);
       assert.equal(result.logs[0].args.to, alice);
+    });
+    it("should be unable to mint cause not not_enough_sheeps  = 20 case", async () => {
+      await contractInstance.setActiveSale(true);
+      await contractInstance._setMaxTotalFluffySheepsTest(20);
+      await contractInstance.mintFluffySheeps(20, {
+        from: alice,
+        value: web3.utils.toWei("0.8", "ether"),
+      });
+      await utils.shouldThrow(
+        contractInstance.mintFluffySheeps(1, {
+          from: alice,
+          value: web3.utils.toWei("0.04", "ether"),
+        })
+      );
+    });
+    it("should be able to mint 1x10 fluffy sheeps totalSheeps = 10 case", async () => {
+      await contractInstance.setActiveSale(true);
+      await contractInstance._setMaxTotalFluffySheepsTest(10);
+      for (var i = 0; i < 10; i++) {
+        const result = await contractInstance.mintFluffySheeps(1, {
+          from: alice,
+          value: web3.utils.toWei("0.4", "ether"),
+        });
+        assert.equal(result.receipt.status, true);
+        assert.equal(result.logs[0].args.to, alice);
+      }
+    });
+    it("should be unable to mint 1x11 fluffy sheeps totalSheeps = 10 case", async () => {
+      await contractInstance.setActiveSale(true);
+      await contractInstance._setMaxTotalFluffySheepsTest(10);
+      for (var i = 0; i < 10; i++) {
+        const result = await contractInstance.mintFluffySheeps(1, {
+          from: alice,
+          value: web3.utils.toWei("0.4", "ether"),
+        });
+        assert.equal(result.receipt.status, true);
+        assert.equal(result.logs[0].args.to, alice);
+      }
+      await utils.shouldThrow(
+        contractInstance.mintFluffySheeps(1, {
+          from: alice,
+          value: web3.utils.toWei("0.04", "ether"),
+        })
+      );
+    });
+    it("should be alice is owner of all sheeps totalSheeps = 10 case", async () => {
+      await contractInstance.setActiveSale(true);
+      await contractInstance._setMaxTotalFluffySheepsTest(10);
+      for (var i = 0; i < 10; i++) {
+        const result = await contractInstance.mintFluffySheeps(1, {
+          from: alice,
+          value: web3.utils.toWei("0.4", "ether"),
+        });
+        assert.equal(result.receipt.status, true);
+        assert.equal(result.logs[0].args.to, alice);
+      }
+      const result = await contractInstance.get;
     });
   });
 });

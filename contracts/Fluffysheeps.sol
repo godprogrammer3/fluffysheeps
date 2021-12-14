@@ -4,8 +4,9 @@ pragma solidity >=0.4.22 <0.9.0;
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 
-contract Fluffysheeps is ERC721, Ownable {
+contract Fluffysheeps is ERC721, Ownable, ERC721Enumerable {
     using SafeMath for uint256;
     string private _baseTokenURI;
     string private _contractURI;
@@ -32,6 +33,24 @@ contract Fluffysheeps is ERC721, Ownable {
 
     function contractURI() public view returns (string memory) {
         return _contractURI;
+    }
+
+    function _beforeTokenTransfer(
+        address from,
+        address to,
+        uint256 tokenId
+    ) internal virtual override(ERC721, ERC721Enumerable) {
+        super._beforeTokenTransfer(from, to, tokenId);
+    }
+
+    function supportsInterface(bytes4 interfaceId)
+        public
+        view
+        virtual
+        override(ERC721, ERC721Enumerable)
+        returns (bool)
+    {
+        return super.supportsInterface(interfaceId);
     }
 
     function mintFluffySheeps(uint256 totalSheeps) public payable {

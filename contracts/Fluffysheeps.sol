@@ -14,11 +14,12 @@ contract Fluffysheeps is ERC721, Ownable, ERC721Enumerable {
     uint256 private _maxTotalGiffFluffySheeps = 100;
     uint256 private _currentTotalFluffySheeps = 0;
     uint256 private _fluffysheepPrice = 0.04 ether;
+    uint256 private _fluffysheepPresalePrice = 0.03 ether;
+    uint256 private _maxPresaleFluffySheepsPerHash = 10;
     bool private _isActiveSale = false;
     bool private _isActivePreSale = false;
     mapping(bytes32 => bool) private _isValidPresaleHashs;
     uint256 private _saleDiscount = 10;
-    uint256 private _preSaleDiscount = 10;
 
     constructor(string memory tokenBaseURI, string memory contractURIParam)
         ERC721("Fluffysheeps", "FFSS")
@@ -86,14 +87,16 @@ contract Fluffysheeps is ERC721, Ownable, ERC721Enumerable {
     ) public payable {
         require(_isActivePreSale, "presale_sale_not_active");
         require(totalSheeps > 0, "invalid_total_sheeps");
-        require(totalSheeps <= 2, "invalid_total_sheeps");
+        require(
+            totalSheeps <= _maxPresaleFluffySheepsPerHash,
+            "invalid_total_sheeps"
+        );
         require(
             _currentTotalFluffySheeps + totalSheeps <= _maxTotalFluffySheeps,
             "not_enough_sheeps"
         );
-        uint256 discount = _calculatePreSaleDiscount(totalSheeps);
         require(
-            msg.value >= _fluffysheepPrice * totalSheeps - discount,
+            msg.value >= _fluffysheepPresalePrice * totalSheeps,
             "payment_value_not_enough"
         );
         require(
@@ -117,9 +120,9 @@ contract Fluffysheeps is ERC721, Ownable, ERC721Enumerable {
         require(payable(owner()).send(address(this).balance));
     }
 
-    function setPresaleHashs(bytes32[] memory _hashs) public onlyOwner {
-        for (uint256 i = 0; i < _hashs.length; i++) {
-            _isValidPresaleHashs[_hashs[i]] = true;
+    function setPresaleKeys(string[] memory _keys) public onlyOwner {
+        for (uint256 i = 0; i < _keys.length; i++) {
+            _isValidPresaleHashs[keccak256(abi.encode(_keys[i]))] = true;
         }
     }
 
@@ -131,12 +134,25 @@ contract Fluffysheeps is ERC721, Ownable, ERC721Enumerable {
         _isActivePreSale = status;
     }
 
+    function setFluffysheepPrice(uint256 fluffysheepPrice) public onlyOwner {
+        _fluffysheepPrice = fluffysheepPrice;
+    }
+
     function setSaleDiscount(uint256 discount) public onlyOwner {
         _saleDiscount = discount;
     }
 
-    function setPreSaleDiscount(uint256 discount) public onlyOwner {
-        _preSaleDiscount = discount;
+    function setMaxPresaleFluffySheepsPerHash(
+        uint256 maxPresaleFluffySheepsPerHash
+    ) public onlyOwner {
+        _maxPresaleFluffySheepsPerHash = maxPresaleFluffySheepsPerHash;
+    }
+
+    function setFluffysheepPresalePrice(uint256 fluffysheepPresalePrice)
+        public
+        onlyOwner
+    {
+        _fluffysheepPresalePrice = fluffysheepPresalePrice;
     }
 
     //random number
@@ -176,14 +192,6 @@ contract Fluffysheeps is ERC721, Ownable, ERC721Enumerable {
         }
     }
 
-    function _calculatePreSaleDiscount(uint256 totalSheeps)
-        private
-        view
-        returns (uint256)
-    {
-        return (totalSheeps * _fluffysheepPrice * _preSaleDiscount) / 100;
-    }
-
     //FOR TEST
     function _calculateDiscountTest(uint256 totalSheeps)
         public
@@ -195,14 +203,6 @@ contract Fluffysheeps is ERC721, Ownable, ERC721Enumerable {
         } else {
             return 0;
         }
-    }
-
-    function _calculatePreSaleDiscountTest(uint256 totalSheeps)
-        public
-        view
-        returns (uint256)
-    {
-        return (totalSheeps * _fluffysheepPrice * _preSaleDiscount) / 100;
     }
 
     function _setMaxTotalFluffySheepsTest(uint256 max) public onlyOwner {

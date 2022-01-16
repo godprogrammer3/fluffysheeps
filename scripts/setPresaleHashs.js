@@ -20,16 +20,15 @@ const NFT_ABI = [
       {
         internalType: "bytes32[]",
         name: "_hashs",
-        type: "bytes32[]"
-      }
+        type: "bytes32[]",
+      },
     ],
     name: "setPresaleHashs",
     outputs: [],
     stateMutability: "nonpayable",
-    type: "function"
+    type: "function",
   },
 ];
-
 
 async function main() {
   const network =
@@ -45,28 +44,28 @@ async function main() {
     const nftContract = new web3Instance.eth.Contract(
       NFT_ABI,
       NFT_CONTRACT_ADDRESS,
-      { gasLimit: "2222222"}
+      { gasLimit: "2222222" }
     );
-    try{
-      let inputs = await require('./allPresaleKeys.json');
-      inputs = inputs.map(input=> web3.utils.soliditySha3(input));
-      inputs = inputs.slice(0,100);
+    try {
+      let inputs = await require("./allPresaleKeys.json");
+      inputs = inputs.map((input) => web3.utils.soliditySha3(input));
       const result = await nftContract.methods
-      .setPresaleHashs(inputs).estimateGas({gas:90000000,from:OWNER_ADDRESS},function(error,gasAmount){
-        if(error){
-          console.log('Error:',error);
-        }else{
-          console.log('Estimate gas:',gasAmount);
-        }
-        
-      });
+        .setPresaleHashs(inputs)
+        .estimateGas(
+          { gas: 90000000, from: OWNER_ADDRESS },
+          function (error, gasAmount) {
+            if (error) {
+              console.log("Error:", error);
+            } else {
+              console.log("Estimate gas:", gasAmount);
+            }
+          }
+        );
       console.log("Set Presale Hashs. Transaction: " + result.transactionHash);
-    }catch(error){
-      console.log('Error :',error);
+    } catch (error) {
+      console.log("Error :", error);
     }
-    
-    
-  } 
+  }
 }
 
 main();

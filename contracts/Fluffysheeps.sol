@@ -193,19 +193,19 @@ contract Fluffysheeps is ERC721, Ownable, ERC721Enumerable {
     }
 
     //FOR TEST
-    function _calculateDiscountTest(uint256 totalSheeps)
-        public
-        view
-        returns (uint256)
-    {
-        if (totalSheeps >= 10) {
-            return (totalSheeps * _fluffysheepPrice * _saleDiscount) / 100;
-        } else {
-            return 0;
-        }
-    }
+    // function _calculateDiscountTest(uint256 totalSheeps)
+    //     public
+    //     view
+    //     returns (uint256)
+    // {
+    //     if (totalSheeps >= 10) {
+    //         return (totalSheeps * _fluffysheepPrice * _saleDiscount) / 100;
+    //     } else {
+    //         return 0;
+    //     }
+    // }
 
-    function _setMaxTotalFluffySheepsTest(uint256 max) public onlyOwner {
-        _maxTotalFluffySheeps = max;
-    }
+    // function _setMaxTotalFluffySheepsTest(uint256 max) public onlyOwner {
+    //     _maxTotalFluffySheeps = max;
+    // }
 }
